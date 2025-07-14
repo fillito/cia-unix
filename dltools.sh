@@ -10,6 +10,35 @@ MAKEROM_VER=0.18.4
 
 # Darwin
 if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Ensure the dependency wget is installed
+    if ! command -v wget &> /dev/null; then
+        echo " * wget not found. Installing..."
+    
+        # Check if Homebrew is installed
+        if ! command -v brew &> /dev/null; then
+            echo " * Homebrew not found. Installing Homebrew first..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            
+            # Add Homebrew to PATH for current session
+            if [[ $(uname -m) == "arm64" ]]; then
+                export PATH="/opt/homebrew/bin:$PATH"
+            else
+                export PATH="/usr/local/bin:$PATH"
+            fi
+        fi
+        
+        # Install wget using Homebrew
+        brew install wget
+        
+        # Verify installation
+        if command -v wget &> /dev/null; then
+            echo "wget successfully installed!"
+        else
+            echo "Error: wget installation failed"
+            exit 1
+        fi
+    fi
+    
     # Apple Silicon
     echo " * Downloading ${BOLD}ctrdecrypt${NORMAL}"
     wget "https://github.com/shijimasoft/ctrdecrypt/releases/download/v${CTRDECRYPT_VER}/ctrdecrypt-macos-universal.zip" -q
